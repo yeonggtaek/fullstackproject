@@ -1,6 +1,7 @@
-<h1>Diary list</h1>
-<ul>
-  <% for (var i = 0; i < data.length; i++) { %>
-  <li>Item <%= data[i].content %></li>
-  <% } %>
-</ul>
+<section class="calendar-container">
+  <%- include('calendar', {monthString: data.monthString, month: data.month,
+  year: data.year, days: data.days}); %>
+</section>
+<section class="list">
+  <div class="list__header"><h2>Diary List</h2></div>
+</section>

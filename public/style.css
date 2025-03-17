@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Poor+Story&display=swap');
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  font-family: 'Poor Story', sans-serif;
+}
+
+body {
+  background-color: #f0f0f0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto;
+  background-color: #fff;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70px;
+}
+
+.calendar-container {
+  height: 390px;
+  background-color: #D5E5D5;
+}
+
+.list {
+  height: 400px;
+}
+
+.list__header {
+  padding: 16px 0;
+  text-align: center;
+}
+
+/* calendar */
+.calendar {
+  padding: 8px;
+}
+.calendar__header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+
+  .month-year {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+.calendar__body {
+  .weekdays {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+  }
+  .days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+  }
+}
+
+.errow {
+  font-size: 20px; 
+  cursor: pointer;
+  display: flex; 
+  justify-content: center;
+  align-items: center;
+  width: 30px; 
+  height: 30px; 
+}
