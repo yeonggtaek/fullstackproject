@@ -9,4 +9,9 @@ router.get("/", async (req, res) => {
   res.render("index", { data });
 });
 
+router.get("/calendar", (req, res) => {
+  const calendarData = makeCalendarData(new Date());
+  res.render("calendar", calendarData); 
+});
+
 module.exports = router;
