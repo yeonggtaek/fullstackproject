@@ -4,7 +4,6 @@ const { getData } = require("./repository");
 const { makeCalendarData } = require("./service");
 
 router.get("/", async (req, res) => {
-  // const data = await getData();
   const data = makeCalendarData(new Date());
   res.render("index", { data });
 });
