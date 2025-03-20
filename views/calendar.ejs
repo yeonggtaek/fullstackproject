@@ -1,27 +1,229 @@
-<div class="calendar">
-  <div class="calendar__header">
-    <div class="errow">&lt;</div>
-    <div class="month-year"><%- monthString %> <%- year %></div>
-    <div class="errow">&gt;</div>
-  </div>
-  <div class="calendar__body">
-    <div class="weekdays">
-      <div>Sun</div>
-      <div>Mon</div>
-      <div>Tue</div>
-      <div>Wed</div>
-      <div>Thu</div>
-      <div>Fri</div>
-      <div>Sat</div>
+<section class="calendar-container">
+  <div class="calendar">
+    <div class="calendar__header">
+      <div class="errow">&lt;</div>
+      <div class="month-year"><%- monthString %> <%- year %></div>
+      <div class="errow">&gt;</div>
     </div>
-    <div class="days">
-      <% days.forEach(day => { %>
-        <% if (day) { %>
-          <div class="day"><%= day.getDate() %></div>
+    <div class="calendar__body">
+      <div class="weekdays">
+        <div>Sun</div>
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+      </div>
+      <div class="days">
+        <% days.forEach(day => { %> <% if (day && day.date) { %>
+        <div class="day <%= day.hasDiary ? "has-diary" : "" %>" data-day="<%= day.date.getFullYear() + "-" + (Number(day.date.getMonth()) + 1) + "-" + day.date.getDate() %>">
+          <%= day.date.getDate() %>
+        </div>
         <% } else { %>
-          <div class="day empty"></div> 
-        <% } %>
-      <% }); %>
+        <div class="day empty"></div>
+        <% } %> <% }); %>
+      </div>
     </div>
   </div>
-</div>
+  <div class="diary-input-container">
+    <div class="diary-input-title">Today Diary</div>
+    <textarea class="diary-input"></textarea>
+    <div class="diary-input-button-wrapper">
+      <button class="diary-input-button cancel">cancel</button>
+      <button class="diary-input-button save">Save</button>
+    </div>
+  </div>
+</section>
+<script>
+  const todayDiaryStore = {
+    selectedDate: null
+  }
+
+  function toggleDiaryInput(show) {
+    const diaryInputContainer = document.querySelector('.diary-input-container');
+    if(show) {
+      diaryInputContainer.style.display = 'flex';
+      return;
+    }
+    diaryInputContainer.style.display = 'none';  
+  }
+
+  function onClickDay() {
+    const day = new Date(this.dataset.day);
+    console.log('day:', day)
+    todayDiaryStore.selectedDate = day;
+    toggleDiaryInput(true);
+  }
+
+  async function postData(url = "", data = {}) {
+    const response = await fetch(url, {
+      method: "POST", 
+      mode: "cors",
+      cache: "no-cache", 
+      credentials: "same-origin", 
+      headers: {
+        "Content-Type": "application/json",
+      },
+      redirect: "follow", 
+      referrerPolicy: "no-referrer", 
+      body: JSON.stringify(data), 
+    });
+    return response.json(); 
+  }
+
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString();
+    const day = date.getDate().toString();
+
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  }
+
+  function addEventListenerToDays() {
+    const days = document.querySelectorAll(".day");
+    days.forEach((day) => {
+      day.addEventListener("click", onClickDay);
+    });
+
+    const saveButton = document.querySelector(".diary-input-button.save");
+    saveButton.addEventListener("click", () => {
+      toggleDiaryInput(false);
+      const date = formatDate(todayDiaryStore.selectedDate);
+      const content = document.querySelector('.diary-input').value
+      document.querySelector('.diary-input').value = '';
+      if(date && content) { 
+        postData("/api/diary", { date, content })
+          .then((data) => {
+            window.location.reload();
+          });
+      }
+    });
+
+    const cancelButton = document.querySelector(".diary-input-button.cancel");
+    cancelButton.addEventListener("click", () => {
+      toggleDiaryInput(false);
+      document.querySelector('.diary-input').value = '';
+    });
+  }
+  addEventListenerToDays();
+</script>
+<style>
+
+  .diary-input-container {
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    padding: 22px;
+
+    .diary-input-title{
+      font-size: 20px;
+      width: 120px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #000000;
+      margin-bottom: 10px;
+    }
+
+    .diary-input{
+      flex: 1;
+      padding: 10px;
+      font-size: 18px;
+      line-height: 1.5;
+      resize: none;
+    }
+
+    .diary-input-button-wrapper{
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      .diary-input-button {
+        border-radius: 16px;
+        padding: 8px 16px;
+        cursor: pointer;
+        &.save {
+          background-color: #EEF1DA;
+        }
+        &.cancel {
+          background-color: #EEF1DA;
+        }
+      }
+    }
+  }
+
+  .calendar-container {
+    position: relative;
+    height: auto;
+    background-color: #d5e5d5;
+  }
+
+  .calendar {
+    padding: 8px;
+  }
+  .calendar__header {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+  }
+
+  .month-year {
+    flex: 1;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .calendar__body .weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 6px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .calendar__body .days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+
+  .day {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    font-weight: bold;
+    border-radius: 50%;
+  }
+
+  .day.has-diary:after {
+    content: "";
+    position: absolute;
+    bottom: 8px;
+    left: 20px;
+    width: 4px;
+    height: 4px;  
+    border-radius: 2px;
+    background-color: rgb(225, 16, 248);
+  }
+
+  .day:not(.empty):hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+  }
+
+  .errow {
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+  }
+</style>
